@@ -1,8 +1,8 @@
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Block {
-    x: usize,
-    y: usize,
+    //x: usize,
+    //y: usize,
     nof_adjacent_mine: u8,
     mined: bool,
     flagged: bool,
@@ -10,10 +10,10 @@ pub struct Block {
 }
 
 impl Block {
-    pub fn new(x: usize, y: usize) -> Block {
+    pub fn new(/*x: usize, y: usize*/) -> Block {
         Block {
-            x,
-            y,
+            //x,
+            //y,
             nof_adjacent_mine: 0,
             mined: false,
             flagged: false,
@@ -21,13 +21,13 @@ impl Block {
         }
     }
 
-    pub fn get_x(&self) -> usize {
+    /*pub fn get_x(&self) -> usize {
         self.x
     }
 
     pub fn get_y(&self) -> usize {
         self.y
-    }
+    }*/
 
     pub fn get_nof_adjacent_mine(&self) -> u8 {
         self.nof_adjacent_mine
@@ -37,7 +37,11 @@ impl Block {
         self.nof_adjacent_mine = nof_adjacent_mine;
     }
 
-    pub fn get_mined(&self) -> bool {
+    pub fn incr_nof_adjacent_mine(&mut self) {
+        self.nof_adjacent_mine += 1;
+    }
+
+    pub fn is_mined(&self) -> bool {
         self.mined
     }
 
@@ -45,7 +49,7 @@ impl Block {
         self.mined = mined;
     }
 
-    pub fn get_flagged(&self) -> bool {
+    pub fn is_flagged(&self) -> bool {
         self.flagged
     }
 
@@ -53,7 +57,7 @@ impl Block {
         self.flagged = flagged;
     }
 
-    pub fn get_swept(&self) -> bool {
+    pub fn is_swept(&self) -> bool {
         self.swept
     }
 

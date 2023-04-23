@@ -53,14 +53,34 @@ impl Minefield {
         self.field.get(y).ok_or(err.clone())?.get(x).ok_or(err)
     }
 
+    /*pub fn get_mut_adjacent_blocks_coord_at_coord(&mut self, x: usize, y: usize) -> Result<Vec<(usize, usize)>> {
+        // Checking out of bound access
+        self.get_block_at_coord(x, y)?;
+        let mut adjacent_blocks_coord: Vec<(usize, usize)> = Vec::new();
+        for i in 0..=2 {
+            for j in 0..=2 {
+                if (x != 0 || i != 0) && (y != 0 || j != 0) && (i != 1 || j != 1) {
+                    let x_coord = x + i - 1;
+                    let y_coord = y + j - 1;
+                    let block = self.get_mut_block_at_coord(x_coord, y_coord);
+                    if block.is_ok() {
+                        adjacent_blocks_coord.push((x_coord, y_coord));
+                    }
+                }
+            }
+        }
+        Ok(adjacent_blocks_coord)
+    }*/
+
     pub fn inc_adjacent_block_value(&mut self, x: usize, y: usize) -> Result<()> {
         // Checking out of bound access
         self.get_block_at_coord(x, y)?;
         for i in 0..=2 {
             for j in 0..=2 {
-                if (x != 0 || i != 0) && (y != 0 || j != 0) && (i != 1 && j != 1) {
+                if (x != 0 || i != 0) && (y != 0 || j != 0) && (i != 1 || j != 1) {
                     let block = self.get_mut_block_at_coord(x + i - 1, y + j - 1);
                     if block.is_ok() {
+                        // TODO: make function more resilient by making sure the number of adjacent mine is not bigger than the actualy amount of adjacent mines
                         block.unwrap().incr_nof_adjacent_mine();
                     }
                 }
@@ -68,31 +88,6 @@ impl Minefield {
         }
         Ok(())
     }
-
-    /*pub fn set_mine_at_coord(&mut self, x: usize, y: usize) -> Result<(), &'static str> {
-        match self.get_mut_block_at_coord(x, y) {
-            Some(block) => {
-                if block.is_mined() {
-                    Err("Block is already mined.")
-                }
-                else {
-                    block.set_mined(true);
-                    Ok(())
-                }
-            },
-            None => Err("Out of bound."),
-        }
-    }*/
-
-    /*pub fn set_nof_adjacent_mine_at_coord(&mut self, x: usize, y: usize, nof_adjacent_mine: u8) -> Result<(), &'static str> {
-        match self.get_mut_block_at_coord(x, y) {
-            Some(block) => {
-                    block.set_nof_adjacent_mine(nof_adjacent_mine);
-                    Ok(())
-            },
-            None => Err("Out of bound."),
-        }
-    }*/
 }
 
 impl fmt::Display for Minefield {
@@ -112,7 +107,7 @@ impl fmt::Display for Minefield {
                 )?;
             }
             if y + 1 != self.field.len() {
-                write!(f, "\n")?;
+                writeln!(f)?;
             }
         }
         Ok(())
@@ -233,6 +228,7 @@ mod tests {
     fn test_inc_adjacent_block_value() {
         let mut minefield: Minefield = Minefield::new(5, 5);
         assert_eq!(minefield.inc_adjacent_block_value(4, 5).err(), Some(MinefieldError::OutOfBound(4, 5)));
+
         assert_eq!(minefield.inc_adjacent_block_value(0, 0).is_ok(), true);
         assert_eq!(minefield.get_block_at_coord(0, 0).unwrap().get_nof_adjacent_mine(), 0);
         assert_eq!(minefield.get_block_at_coord(0, 1).unwrap().get_nof_adjacent_mine(), 1);
@@ -240,5 +236,52 @@ mod tests {
         assert_eq!(minefield.get_block_at_coord(1, 1).unwrap().get_nof_adjacent_mine(), 1);
         assert_eq!(minefield.get_block_at_coord(0, 2).unwrap().get_nof_adjacent_mine(), 0);
         assert_eq!(minefield.get_block_at_coord(2, 0).unwrap().get_nof_adjacent_mine(), 0);
+
+        assert_eq!(minefield.inc_adjacent_block_value(1, 0).is_ok(), true);
+        assert_eq!(minefield.get_block_at_coord(0, 0).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(1, 0).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(0, 1).unwrap().get_nof_adjacent_mine(), 2);
+        assert_eq!(minefield.get_block_at_coord(1, 1).unwrap().get_nof_adjacent_mine(), 2);
+        assert_eq!(minefield.get_block_at_coord(0, 2).unwrap().get_nof_adjacent_mine(), 0);
+        assert_eq!(minefield.get_block_at_coord(1, 2).unwrap().get_nof_adjacent_mine(), 0);
+        assert_eq!(minefield.get_block_at_coord(2, 2).unwrap().get_nof_adjacent_mine(), 0);
+        assert_eq!(minefield.get_block_at_coord(2, 0).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(2, 1).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(3, 0).unwrap().get_nof_adjacent_mine(), 0);
+        assert_eq!(minefield.get_block_at_coord(3, 1).unwrap().get_nof_adjacent_mine(), 0);
+
+        assert_eq!(minefield.inc_adjacent_block_value(2, 2).is_ok(), true);
+        assert_eq!(minefield.get_block_at_coord(0, 0).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(1, 0).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(0, 1).unwrap().get_nof_adjacent_mine(), 2);
+        assert_eq!(minefield.get_block_at_coord(1, 1).unwrap().get_nof_adjacent_mine(), 3);
+        assert_eq!(minefield.get_block_at_coord(0, 2).unwrap().get_nof_adjacent_mine(), 0);
+        assert_eq!(minefield.get_block_at_coord(1, 2).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(2, 2).unwrap().get_nof_adjacent_mine(), 0);
+        assert_eq!(minefield.get_block_at_coord(2, 0).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(2, 1).unwrap().get_nof_adjacent_mine(), 2);
+        assert_eq!(minefield.get_block_at_coord(3, 0).unwrap().get_nof_adjacent_mine(), 0);
+        assert_eq!(minefield.get_block_at_coord(3, 1).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(1, 3).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(2, 3).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(3, 2).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(3, 3).unwrap().get_nof_adjacent_mine(), 1);
+
+        assert_eq!(minefield.inc_adjacent_block_value(2, 2).is_ok(), true);
+        assert_eq!(minefield.get_block_at_coord(0, 0).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(1, 0).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(0, 1).unwrap().get_nof_adjacent_mine(), 2);
+        assert_eq!(minefield.get_block_at_coord(1, 1).unwrap().get_nof_adjacent_mine(), 4);
+        assert_eq!(minefield.get_block_at_coord(0, 2).unwrap().get_nof_adjacent_mine(), 0);
+        assert_eq!(minefield.get_block_at_coord(1, 2).unwrap().get_nof_adjacent_mine(), 2);
+        assert_eq!(minefield.get_block_at_coord(2, 2).unwrap().get_nof_adjacent_mine(), 0);
+        assert_eq!(minefield.get_block_at_coord(2, 0).unwrap().get_nof_adjacent_mine(), 1);
+        assert_eq!(minefield.get_block_at_coord(2, 1).unwrap().get_nof_adjacent_mine(), 3);
+        assert_eq!(minefield.get_block_at_coord(3, 0).unwrap().get_nof_adjacent_mine(), 0);
+        assert_eq!(minefield.get_block_at_coord(3, 1).unwrap().get_nof_adjacent_mine(), 2);
+        assert_eq!(minefield.get_block_at_coord(1, 3).unwrap().get_nof_adjacent_mine(), 2);
+        assert_eq!(minefield.get_block_at_coord(2, 3).unwrap().get_nof_adjacent_mine(), 2);
+        assert_eq!(minefield.get_block_at_coord(3, 2).unwrap().get_nof_adjacent_mine(), 2);
+        assert_eq!(minefield.get_block_at_coord(3, 3).unwrap().get_nof_adjacent_mine(), 2);
     }
 }

@@ -2,7 +2,7 @@
 pub struct Block {
     //x: usize,
     //y: usize,
-    nof_adjacent_mine: u8,
+    nof_adjacent_mine: usize,
     mined: bool,
     flagged: bool,
     swept: bool,
@@ -28,11 +28,11 @@ impl Block {
         self.y
     }*/
 
-    pub fn get_nof_adjacent_mine(&self) -> u8 {
+    pub fn get_nof_adjacent_mine(&self) -> usize {
         self.nof_adjacent_mine
     }
 
-    pub fn set_nof_adjacent_mine(&mut self, nof_adjacent_mine: u8) {
+    pub fn set_nof_adjacent_mine(&mut self, nof_adjacent_mine: usize) {
         self.nof_adjacent_mine = nof_adjacent_mine;
     }
 

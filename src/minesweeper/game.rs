@@ -1,6 +1,6 @@
 use rand::Rng;
 
-use super::minefield::Minefield;
+use super::minefield::*;
 
 #[derive(Debug)]
 pub struct MinesweeperGame {
@@ -21,11 +21,8 @@ impl MinesweeperGame {
         for y in 0..self.minefield.get_length() {
             for x in 0..self.minefield.get_width() {
                 if rng.gen_range(0..100) < 15 {
-                    match self.minefield.inc_adjacent_block_value(x, y) {
-                        Ok(_) => match self.minefield.get_mut_block_at_coord(x, y) {
-                            Ok(block) => block.set_mined(true),
-                            Err(e) => println!("{}", e),
-                        },
+                    match self.minefield.get_mut_block_at_coord((x, y)) {
+                        Ok(block) => block.set_mined(true),
                         Err(e) => println!("{}", e),
                     }
                 }

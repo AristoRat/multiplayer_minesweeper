@@ -1,14 +1,8 @@
-use super::block::Block;
+use std::error::Error;
 use std::fmt;
 use std::fmt::Debug;
 
-type Result<T> = std::result::Result<T, MinefieldError>;
-pub type Coordinate = (usize, usize);
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum MinefieldError {
-    OutOfBound(Coordinate),
-}
+use super::block::Block;
 
 #[derive(Debug)]
 pub struct Minefield {
@@ -117,6 +111,14 @@ impl fmt::Display for Minefield {
     }
 }
 
+type Result<T> = std::result::Result<T, MinefieldError>;
+pub type Coordinate = (usize, usize);
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum MinefieldError {
+    OutOfBound(Coordinate),
+}
+
 impl fmt::Display for MinefieldError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
@@ -130,6 +132,8 @@ impl fmt::Display for MinefieldError {
         }
     }
 }
+
+impl Error for MinefieldError {}
 
 #[cfg(test)]
 mod tests {

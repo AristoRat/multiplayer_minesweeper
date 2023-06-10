@@ -1,7 +1,8 @@
+pub type Coordinate = (usize, usize);
+
 #[derive(Debug, PartialEq)]
 pub struct Block {
-    //x: usize,
-    //y: usize,
+    coordinate: Coordinate,
     nof_adjacent_mine: usize,
     mined: bool,
     flagged: bool,
@@ -9,10 +10,9 @@ pub struct Block {
 }
 
 impl Block {
-    pub fn new(/*x: usize, y: usize*/) -> Block {
+    pub fn new(coordinate: Coordinate) -> Block {
         Block {
-            //x,
-            //y,
+            coordinate,
             nof_adjacent_mine: 0,
             mined: false,
             flagged: false,
@@ -27,6 +27,10 @@ impl Block {
     pub fn get_y(&self) -> usize {
         self.y
     }*/
+
+    pub fn get_coordinate(&self) -> Coordinate {
+        self.coordinate
+    }
 
     pub fn get_nof_adjacent_mine(&self) -> usize {
         self.nof_adjacent_mine

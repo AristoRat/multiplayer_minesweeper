@@ -4,6 +4,7 @@ use std::fmt::Debug;
 
 use rand::Rng;
 
+use super::block::Coordinate;
 use super::minefield::*;
 
 type Result<T> = std::result::Result<T, MinesweeperGameError>;
